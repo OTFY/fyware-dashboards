@@ -17,6 +17,7 @@
     --text: #F2F2F0;
     --text-dim: #B8BBBA;
     --text-faint: #8A8D8C;
+    --ok: #4CAF7D;
     --radius: 14px;
   }
 
@@ -185,6 +186,23 @@
     color: var(--text-faint);
     border: 1px dashed var(--border);
   }
+  .card-open-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 14px;
+    padding: 8px 14px;
+    border-radius: 9px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 500;
+    align-self: flex-start;
+    transition: all .15s ease;
+  }
+  .card-open-btn:hover { border-color: var(--accent); color: #fff; }
+  .card-open-btn svg { width: 13px; height: 13px; }
 
   /* checkbox custom */
   .card-check {
@@ -255,150 +273,133 @@
   }
   .fab:disabled:hover { transform: translateX(-50%); }
 
-  /* ============ VISTA MULTI-PANEL ============ */
-  .viewer {
+  /* ============ LANZADOR (overlay) ============ */
+  .launcher-backdrop {
     position: fixed;
     inset: 0;
-    background: var(--bg);
+    background: rgba(0, 0, 0, 0.55);
     display: none;
-    flex-direction: column;
-    justify-content: flex-start;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
     z-index: 100;
   }
-  .viewer.open { display: flex; }
-
-  .viewer-topbar {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 16px;
-    border-bottom: 1px solid var(--border);
-    flex-shrink: 0;
-  }
-  .back-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 16px;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    background: var(--card);
-    color: var(--text);
-    font-size: 13.5px;
-    font-weight: 500;
-    transition: all .15s ease;
-  }
-  .back-btn:hover { border-color: var(--accent); }
-  .viewer-count { font-size: 13px; color: var(--text-faint); }
-
-  .panel-grid {
-    flex: 1;
-    display: grid;
-    gap: 8px;
-    padding: 8px;
-    min-height: 0;
-  }
-  .panel-grid.cols-1 { grid-template-columns: 1fr; }
-  .panel-grid.cols-2 { grid-template-columns: 1fr 1fr; }
-  .panel-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
-
-  .panel {
+  .launcher-backdrop.open { display: flex; }
+  .launcher {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+    width: 100%;
+    max-width: 520px;
+    max-height: 80vh;
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 12px;
+    border-radius: var(--radius);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
     overflow: hidden;
-    min-height: 0;
   }
-  .panel-bar {
+  .launcher-head {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 7px 12px;
-    background: #323636;
+    gap: 10px;
+    padding: 16px 20px;
     border-bottom: 1px solid var(--border);
-    flex-shrink: 0;
   }
-  .panel-title {
-    font-size: 13px;
-    font-weight: 600;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    flex: 1;
-  }
-  .panel-btn {
-    width: 28px;
-    height: 28px;
-    border-radius: 7px;
+  .launcher-title { font-size: 16px; font-weight: 700; flex: 1; }
+  .launcher-close {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
     border: none;
     background: transparent;
     color: var(--text-dim);
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
-    transition: all .12s ease;
   }
-  .panel-btn:hover { background: rgba(255, 255, 255, 0.08); color: var(--text); }
-  .panel-btn.close-btn:hover { background: rgba(232, 56, 51, 0.2); color: var(--accent); }
-  .panel-btn svg { width: 15px; height: 15px; }
+  .launcher-close:hover { background: rgba(255, 255, 255, 0.08); color: var(--text); }
 
-  .panel-body { position: relative; flex: 1; min-height: 0; }
-  .panel-body iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
-    background: #fff;
-    display: block;
+  .popup-warn {
+    display: none;
+    gap: 10px;
+    align-items: flex-start;
+    margin: 14px 20px 0;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: rgba(232, 56, 51, 0.12);
+    border: 1px solid rgba(232, 56, 51, 0.4);
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--text-dim);
   }
+  .popup-warn.visible { display: flex; }
+  .popup-warn strong { color: var(--text); }
 
-  .panel-loading, .panel-fallback {
-    position: absolute;
-    inset: 0;
+  .launch-list {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+    gap: 8px;
+    padding: 16px 20px;
+    overflow-y: auto;
+  }
+  .launch-row {
+    display: flex;
     align-items: center;
-    padding-top: 15vh;
-    gap: 14px;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 10px;
     background: var(--bg);
+    border: 1px solid var(--border);
   }
-  .spinner {
-    width: 30px;
-    height: 30px;
-    border: 3px solid var(--border);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .panel-loading span { font-size: 13px; color: var(--text-faint); }
-
-  .panel-fallback { display: none; }
-  .panel-fallback.visible { display: flex; }
-  .panel-fallback p {
+  .launch-row-title {
+    flex: 1;
     font-size: 14px;
-    color: var(--text-dim);
-    text-align: center;
-    max-width: 320px;
-    line-height: 1.5;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
-  .open-tab-btn {
-    padding: 10px 20px;
+  .launch-status {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ok);
+    display: none;
+    align-items: center;
+    gap: 5px;
+  }
+  .launch-status.visible { display: flex; }
+  .launch-btn {
+    padding: 8px 16px;
+    border-radius: 9px;
+    border: none;
+    background: var(--accent);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .launch-btn:hover { filter: brightness(1.1); }
+  .launch-btn.done { display: none; }
+
+  .launcher-foot {
+    display: flex;
+    gap: 10px;
+    padding: 14px 20px 18px;
+    border-top: 1px solid var(--border);
+  }
+  .open-all-btn {
+    flex: 1;
+    padding: 12px;
     border-radius: 10px;
     border: none;
     background: var(--accent);
     color: #fff;
-    font-size: 13.5px;
+    font-size: 14px;
     font-weight: 600;
   }
-  .open-tab-btn:hover { filter: brightness(1.1); }
+  .open-all-btn:hover { filter: brightness(1.1); }
 
   @media (max-width: 900px) {
-    .panel-grid.cols-2, .panel-grid.cols-3 { grid-template-columns: 1fr; }
     .gallery { padding: 18px 18px 110px; }
     .site-header, .toolbar { padding-left: 18px; padding-right: 18px; }
   }
@@ -427,26 +428,36 @@
 
 <main class="gallery" id="gallery"></main>
 
-<button class="fab" id="fab" disabled>Ver seleccionados (0)</button>
+<button class="fab" id="fab" disabled>Abrir seleccionados (0)</button>
 
-<div class="viewer" id="viewer">
-  <div class="viewer-topbar">
-    <button class="back-btn" id="backBtn">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M19 12H5"></path><path d="M12 19l-7-7 7-7"></path>
-      </svg>
-      Volver a galeria
-    </button>
-    <span class="viewer-count" id="viewerCount"></span>
+<div class="launcher-backdrop" id="launcherBackdrop">
+  <div class="launcher">
+    <div class="launcher-head">
+      <span class="launcher-title">Abrir dashboards</span>
+      <button class="launcher-close" id="launcherClose" title="Cerrar" aria-label="Cerrar">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+    </div>
+    <div class="popup-warn" id="popupWarn">
+      <span>
+        <strong>Tu navegador bloqueo algunas ventanas.</strong>
+        Permite las ventanas emergentes de este sitio (icono en la barra de direcciones)
+        o abre cada dashboard con su boton.
+      </span>
+    </div>
+    <div class="launch-list" id="launchList"></div>
+    <div class="launcher-foot">
+      <button class="open-all-btn" id="openAllBtn">Abrir todos</button>
+    </div>
   </div>
-  <div class="panel-grid" id="panelGrid"></div>
 </div>
 
 <script>
 // ================================================================
 // DASHBOARDS: para agregar uno nuevo, copia un objeto y pega su URL
-// publicada de Claude. Recuerda agregar "otfy.github.io" a los
-// Allowed domains del artefacto en Claude (ver README).
+// publica de Claude (https://claude.ai/public/artifacts/...).
+// Los dashboards abren en pestana nueva; requieren sesion de Claude
+// para mostrar datos. Ver README.
 // ================================================================
 const DASHBOARDS = [
   {
@@ -475,10 +486,9 @@ const DASHBOARDS = [
   }
 ];
 
-const MAX_PANELS = 6;
-
 // ---------------- Estado (solo en memoria) ----------------
 const selected = new Set();
+const openedIds = new Set();
 let activeTag = null;
 let searchText = "";
 
@@ -487,10 +497,11 @@ const galleryEl = document.getElementById("gallery");
 const fabEl = document.getElementById("fab");
 const tagFiltersEl = document.getElementById("tagFilters");
 const searchInput = document.getElementById("searchInput");
-const viewerEl = document.getElementById("viewer");
-const panelGridEl = document.getElementById("panelGrid");
-const viewerCountEl = document.getElementById("viewerCount");
-const backBtn = document.getElementById("backBtn");
+const launcherBackdrop = document.getElementById("launcherBackdrop");
+const launcherClose = document.getElementById("launcherClose");
+const launchList = document.getElementById("launchList");
+const openAllBtn = document.getElementById("openAllBtn");
+const popupWarn = document.getElementById("popupWarn");
 
 // ---------------- Filtros de tags ----------------
 function renderTagFilters() {
@@ -564,6 +575,17 @@ function renderGallery() {
     desc.className = "card-desc";
     desc.textContent = d.descripcion;
 
+    card.appendChild(top);
+    card.appendChild(desc);
+
+    if (!pending) {
+      const openBtn = document.createElement("button");
+      openBtn.className = "card-open-btn";
+      openBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><path d="M15 3h6v6"></path><path d="M10 14L21 3"></path></svg> Abrir';
+      openBtn.onclick = () => window.open(d.url, "_blank", "noopener");
+      card.appendChild(openBtn);
+    }
+
     const footer = document.createElement("div");
     footer.className = "card-footer";
     d.tags.forEach(tag => {
@@ -583,175 +605,92 @@ function renderGallery() {
     edited.textContent = "Editado " + d.editado;
     footer.appendChild(edited);
 
-    card.appendChild(top);
-    card.appendChild(desc);
     card.appendChild(footer);
     galleryEl.appendChild(card);
   });
 }
 
 function toggleSelect(id, isChecked) {
-  if (isChecked) {
-    if (selected.size >= MAX_PANELS) {
-      alert("Maximo " + MAX_PANELS + " dashboards a la vez.");
-      renderGallery();
-      return;
-    }
-    selected.add(id);
-  } else {
-    selected.delete(id);
-  }
+  if (isChecked) selected.add(id); else selected.delete(id);
   updateFab();
   renderGallery();
 }
 
 function updateFab() {
   const n = selected.size;
-  fabEl.textContent = "Ver seleccionados (" + n + ")";
+  fabEl.textContent = "Abrir seleccionados (" + n + ")";
   fabEl.disabled = n < 1;
 }
 
-// ---------------- Vista multi-panel ----------------
-function gridColsFor(n) {
-  if (n <= 1) return 1;
-  if (n === 2) return 2;
-  if (n <= 4) return 2;
-  return 3; // 5-6 => 3x2
-}
-
-function openViewer() {
+// ---------------- Lanzador ----------------
+function openLauncher() {
   const items = DASHBOARDS.filter(d => selected.has(d.id) && d.url);
   if (items.length === 0) return;
 
-  panelGridEl.className = "panel-grid cols-" + gridColsFor(items.length);
-  panelGridEl.innerHTML = "";
-  items.forEach(d => panelGridEl.appendChild(buildPanel(d)));
-  viewerCountEl.textContent = items.length + (items.length === 1 ? " dashboard" : " dashboards");
-  viewerEl.classList.add("open");
-}
+  openedIds.clear();
+  popupWarn.classList.remove("visible");
+  launchList.innerHTML = "";
 
-function buildPanel(d) {
-  const panel = document.createElement("div");
-  panel.className = "panel";
-  panel.dataset.id = d.id;
+  items.forEach(d => {
+    const row = document.createElement("div");
+    row.className = "launch-row";
+    row.dataset.id = d.id;
 
-  // barra superior
-  const bar = document.createElement("div");
-  bar.className = "panel-bar";
+    const title = document.createElement("span");
+    title.className = "launch-row-title";
+    title.textContent = d.titulo;
 
-  const title = document.createElement("span");
-  title.className = "panel-title";
-  title.textContent = d.titulo;
+    const status = document.createElement("span");
+    status.className = "launch-status";
+    status.textContent = "Abierto";
 
-  const reloadBtn = makePanelBtn(
-    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"></path><path d="M21 3v6h-6"></path></svg>',
-    "Recargar"
-  );
-  const fsBtn = makePanelBtn(
-    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"></path><path d="M16 3h3a2 2 0 0 1 2 2v3"></path><path d="M8 21H5a2 2 0 0 1-2-2v-3"></path><path d="M16 21h3a2 2 0 0 0 2-2v-3"></path></svg>',
-    "Pantalla completa"
-  );
-  const closeBtn = makePanelBtn(
-    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>',
-    "Cerrar panel"
-  );
-  closeBtn.classList.add("close-btn");
+    const btn = document.createElement("button");
+    btn.className = "launch-btn";
+    btn.textContent = "Abrir";
+    btn.onclick = () => tryOpen(d, row);
 
-  bar.appendChild(title);
-  bar.appendChild(reloadBtn);
-  bar.appendChild(fsBtn);
-  bar.appendChild(closeBtn);
-
-  // cuerpo con iframe + loading + fallback
-  const body = document.createElement("div");
-  body.className = "panel-body";
-
-  const loading = document.createElement("div");
-  loading.className = "panel-loading";
-  loading.innerHTML = '<div class="spinner"></div><span>Cargando dashboard...</span>';
-
-  const fallback = document.createElement("div");
-  fallback.className = "panel-fallback";
-  const fbText = document.createElement("p");
-  fbText.textContent = "Este dashboard no cargo. Puede requerir sesion de Claude o que el dominio del hub este autorizado en el artefacto.";
-  const fbBtn = document.createElement("button");
-  fbBtn.className = "open-tab-btn";
-  fbBtn.textContent = "Abrir en pestaña nueva";
-  fbBtn.onclick = () => window.open(d.url, "_blank", "noopener");
-  fallback.appendChild(fbText);
-  fallback.appendChild(fbBtn);
-
-  const iframe = document.createElement("iframe");
-  iframe.title = d.titulo;
-  iframe.setAttribute("loading", "eager");
-
-  let timer = null;
-  function load() {
-    loading.style.display = "flex";
-    fallback.classList.remove("visible");
-    clearTimeout(timer);
-    timer = setTimeout(() => {
-      loading.style.display = "none";
-      fallback.classList.add("visible");
-    }, 8000);
-    iframe.src = d.url;
-  }
-  iframe.addEventListener("load", () => {
-    clearTimeout(timer);
-    loading.style.display = "none";
-    fallback.classList.remove("visible");
+    row.appendChild(title);
+    row.appendChild(status);
+    row.appendChild(btn);
+    launchList.appendChild(row);
   });
 
-  reloadBtn.onclick = () => { iframe.src = "about:blank"; requestAnimationFrame(load); };
-  fsBtn.onclick = () => {
-    if (document.fullscreenElement === panel) {
-      document.exitFullscreen();
-    } else if (panel.requestFullscreen) {
-      panel.requestFullscreen();
-    }
-  };
-  closeBtn.onclick = () => {
-    clearTimeout(timer);
-    selected.delete(d.id);
-    updateFab();
-    renderGallery();
-    panel.remove();
-    const remaining = panelGridEl.children.length;
-    if (remaining === 0) {
-      closeViewer();
-    } else {
-      panelGridEl.className = "panel-grid cols-" + gridColsFor(remaining);
-      viewerCountEl.textContent = remaining + (remaining === 1 ? " dashboard" : " dashboards");
-    }
-  };
-
-  body.appendChild(iframe);
-  body.appendChild(loading);
-  body.appendChild(fallback);
-  panel.appendChild(bar);
-  panel.appendChild(body);
-
-  load();
-  return panel;
+  launcherBackdrop.classList.add("open");
+  openAll();
 }
 
-function makePanelBtn(svg, label) {
-  const btn = document.createElement("button");
-  btn.className = "panel-btn";
-  btn.innerHTML = svg;
-  btn.title = label;
-  btn.setAttribute("aria-label", label);
-  return btn;
+function tryOpen(d, row) {
+  const win = window.open(d.url, "_blank", "noopener");
+  const ok = win !== null;
+  if (ok) {
+    openedIds.add(d.id);
+    row.querySelector(".launch-status").classList.add("visible");
+    row.querySelector(".launch-btn").classList.add("done");
+  }
+  return ok;
 }
 
-function closeViewer() {
-  viewerEl.classList.remove("open");
-  panelGridEl.innerHTML = "";
+function openAll() {
+  const items = DASHBOARDS.filter(d => selected.has(d.id) && d.url && !openedIds.has(d.id));
+  let blocked = 0;
+  items.forEach(d => {
+    const row = launchList.querySelector('[data-id="' + d.id + '"]');
+    if (row && !tryOpen(d, row)) blocked++;
+  });
+  popupWarn.classList.toggle("visible", blocked > 0);
+}
+
+function closeLauncher() {
+  launcherBackdrop.classList.remove("open");
 }
 
 // ---------------- Eventos globales ----------------
-fabEl.onclick = openViewer;
-backBtn.onclick = closeViewer;
+fabEl.onclick = openLauncher;
+openAllBtn.onclick = openAll;
+launcherClose.onclick = closeLauncher;
+launcherBackdrop.addEventListener("click", e => {
+  if (e.target === launcherBackdrop) closeLauncher();
+});
 searchInput.addEventListener("input", e => {
   searchText = e.target.value.trim();
   renderGallery();
