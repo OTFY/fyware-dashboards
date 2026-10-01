@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<title>6DoF</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+         background: #2b2e2e; color: #f3f3f3; font: 16px/1.5 Arial, Helvetica, sans-serif; padding: 16px; box-sizing: border-box; }
+  a { color: #f3fc78; }
+</style>
+</head>
+<body>
+<p id="msg">Abriendo…</p>
+<script>
+/* Pagina intermedia de las ligas del 6DoF. Anota el clic en la hoja "6DoF - clics"
+   (Apps Script de Oscar) y manda al destino. Solo cuenta si el navegador corre JS,
+   asi que los escaneres de correo que solo bajan el HTML no suman.
+   Liga: ?l=<edicion-pieza>&u=<destino codificado>
+   ?yo en cualquier visita marca este navegador como de Oscar: sus pruebas no cuentan (?yo=0 lo apaga). */
+(function () {
+  var CONTADOR = 'https://script.google.com/macros/s/AKfycbzOBBaHQDNBao1D35GZXOb1kz_4KjfwydqH18irOdsjDO30WzObr1z5z9fWkewaWqE5/exec';
+  var PERMITIDOS = ['www.fyware.com', 'fyware.com', 'www.youtube.com', 'youtube.com', 'youtu.be',
+                    'docs.google.com', 'script.google.com', 'storage.googleapis.com'];
+  var q = new URLSearchParams(location.search);
+  var msg = document.getElementById('msg');
+
+  try {
+    if (q.has('yo')) localStorage.setItem('fy6dof_yo', q.get('yo') === '0' ? '' : '1');
+  } catch (e) {}
+  var esOscar = false;
+  try { esOscar = localStorage.getItem('fy6dof_yo') === '1'; } catch (e) {}
+
+  var clave = (q.get('l') || '').toLowerCase();
+  if (!/^[a-z0-9-]{1,60}$/.test(clave)) clave = 'sin-clave';
+
+  var destino = null;
+  try {
+    var u = new URL(q.get('u') || '');
+    var ok = u.protocol === 'https:' && PERMITIDOS.indexOf(u.hostname) !== -1;
+    /* script.google.com aloja apps de cualquiera: solo el portafolio comercial */
+    if (ok && u.hostname === 'script.google.com' &&
+        u.pathname.indexOf('/macros/s/AKfycbxIQIP8C8gzbWi0jEkSwYfOxUonUlJZYzbKXailEjO1kOupgVqlYwalMsG4eT3ZI7xn/') !== 0) ok = false;
+    if (ok) destino = u.href;
+  } catch (e) {}
+
+  if (!destino) {
+    msg.textContent = q.has('yo') ? (esOscar ? 'Listo: tus clics en este navegador ya no cuentan.' : 'Listo: tus clics vuelven a contar.')
+                                  : 'Esta liga no es válida.';
+    return;
+  }
+
+  var listo = false;
+  function ir() { if (listo) return; listo = true; location.replace(destino); }
+
+  if (esOscar || CONTADOR.indexOf('https://') !== 0) { ir(); return; }
+
+  var img = new Image();
+  img.onload = img.onerror = ir;
+  img.src = CONTADOR + '?t=' + encodeURIComponent(clave) + '&n=' + Date.now();
+  setTimeout(ir, 1200);
+  setTimeout(function () {
+    msg.innerHTML = '';
+    var a = document.createElement('a'); a.href = destino; a.textContent = 'Si no se abrió solo, da clic aquí';
+    msg.appendChild(a);
+  }, 3000);
+})();
+</script>
+</body>
+</html>
